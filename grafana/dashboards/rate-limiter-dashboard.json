@@ -1,0 +1,123 @@
+{
+  "id": null,
+  "uid": "rate-limiter-dashboard",
+  "title": "Rate Limiter Dashboard",
+  "tags": ["rate-limiter", "api-gateway"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Requests per Second",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(ratelimit_requests_total[1m]))",
+          "legendFormat": "Total req/s",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2 }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Blocked Requests per Second",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(ratelimit_blocked_total[1m]))",
+          "legendFormat": "Blocked req/s",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "red", "mode": "fixed" },
+          "custom": { "lineWidth": 2 }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Block Rate % by Endpoint",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "100 * sum by (endpoint) (rate(ratelimit_blocked_total[5m])) / sum by (endpoint) (rate(ratelimit_requests_total[5m]))",
+          "legendFormat": "{{endpoint}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": { "lineWidth": 2 }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Top 10 Clients by Request Volume",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (client) (rate(ratelimit_requests_total[5m])))",
+          "legendFormat": "{{client}}",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        { "id": "labelsToFields", "options": {} },
+        { "id": "organize", "options": { "renameByName": { "client": "Client ID", "Value": "Req/s" } } }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Allowed vs Blocked (Last 5m)",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum(increase(ratelimit_allowed_total[5m]))",
+          "legendFormat": "Allowed",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(increase(ratelimit_blocked_total[5m]))",
+          "legendFormat": "Blocked",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Rate Limit Check Duration (ms)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 16 },
+      "targets": [
+        {
+          "expr": "rate(ratelimit_check_duration_ms_sum[1m]) / rate(ratelimit_check_duration_ms_count[1m])",
+          "legendFormat": "Avg check duration ms",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      }
+    }
+  ]
+}

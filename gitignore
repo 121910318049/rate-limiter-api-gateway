@@ -1,0 +1,33 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.eclipse/
+.settings/
+.classpath
+.project
+*.xml.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes (don't push data)
+postgres_data/
+grafana_data/
+
+# Environment files
+.env
+*.env.local
+
+# Logs
+*.log
+logs/
+
+# Spring Boot
+spring-shell.log
